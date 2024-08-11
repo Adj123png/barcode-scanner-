@@ -20,11 +20,15 @@ startScanButton.addEventListener('click', () => {
 });
 
 saveRecordsButton.addEventListener('click', () => {
-    const blob = new Blob([JSON.stringify(records, null, 2)], { type: 'application/json' });
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet([["条形码"]].concat(records.map(record => [record])));
+    XLSX.utils.book_append_sheet(wb, ws, "Records");
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([wbout], { type: 'application/octet-stream' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'records.json';
+    a.download = 'records.xlsx';
     a.click();
     URL.revokeObjectURL(url);
 });
